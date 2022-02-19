@@ -27,6 +27,7 @@
                     ></ImageDayNight>
                 </router-link>
                 <LedgerButton class="menu_option button_primary"></LedgerButton>
+                <SecuXButton class="menu_option button_primary"></SecuXButton>
                 <!--            <TorusGoogle class="option button_primary" text="Google"></TorusGoogle>-->
             </div>
         </div>
@@ -39,6 +40,7 @@
 <script lang="ts">
 import { Vue, Component } from 'vue-property-decorator'
 import LedgerButton from '@/components/Ledger/LedgerButton.vue'
+import SecuXButton from '@/components/Secux/SecuXButton.vue'
 import AccountsFound from '@/components/Access/AccountsFound.vue'
 import ToS from '@/components/misc/ToS.vue'
 import ImageDayNight from '@/components/misc/ImageDayNight.vue'
@@ -48,6 +50,7 @@ import ImageDayNight from '@/components/misc/ImageDayNight.vue'
         ImageDayNight,
         ToS,
         LedgerButton,
+        SecuXButton,
         AccountsFound,
     },
 })
