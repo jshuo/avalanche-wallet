@@ -61,7 +61,7 @@ import { abiDecoder, web3 } from '@/evm'
 import { AVA_ACCOUNT_PATH, ETH_ACCOUNT_PATH, LEDGER_ETH_ACCOUNT_PATH } from './MnemonicWallet'
 import { ChainIdType } from '@/constants'
 import { ParseableAvmTxEnum, ParseablePlatformEnum, ParseableEvmTxEnum } from '../TxHelper'
-import { ILedgerBlockMessage } from '../../store/modules/ledger/types'
+import { ILedgerBlockMessage } from '../../store/modules/secux/types'
 import Erc20Token from '@/js/Erc20Token'
 import { WalletHelper } from '@/helpers/wallet_helper'
 import { Utils, NetworkHelper, Network } from '@avalabs/avalanche-wallet-sdk'
@@ -350,7 +350,7 @@ class SecuXWallet extends HdWalletCore implements AvaWalletCore {
         const msg: Buffer = Buffer.from(createHash('sha256').update(txbuff).digest())
 
         try {
-            store.commit('Ledger/openModal', {
+            store.commit('SecuX/openModal', {
                 title: 'Sign Hash',
                 messages: [],
                 info: msg.toString('hex').toUpperCase(),
@@ -362,7 +362,7 @@ class SecuXWallet extends HdWalletCore implements AvaWalletCore {
             const accountPathSource = chainId === 'C' ? ETH_ACCOUNT_PATH : AVA_ACCOUNT_PATH
             const accountPath = bippath.fromString(`${accountPathSource}`)
             let sigMap = await this.app.signHash(accountPath, bip32Paths, msg)
-            store.commit('Ledger/closeModal')
+            store.commit('SecuX/closeModal')
 
             let creds: Credential[] = this.getCredentials<UnsignedTx>(
                 unsignedTx,
@@ -386,7 +386,7 @@ class SecuXWallet extends HdWalletCore implements AvaWalletCore {
 
             return signedTx as SignedTx
         } catch (e) {
-            store.commit('Ledger/closeModal')
+            store.commit('SecuX/closeModal')
             console.error(e)
             throw e
         }
@@ -418,7 +418,7 @@ class SecuXWallet extends HdWalletCore implements AvaWalletCore {
         let messages = this.getTransactionMessages<UnsignedTx>(unsignedTx, chainId, changePath)
 
         try {
-            store.commit('Ledger/openModal', {
+            store.commit('SecuX/openModal', {
                 title: title,
                 messages: messages,
                 info: null,
@@ -449,7 +449,7 @@ class SecuXWallet extends HdWalletCore implements AvaWalletCore {
 
             return signedTx as SignedTx
         } catch (e) {
-            store.commit('Ledger/closeModal')
+            store.commit('SecuX/closeModal')
             console.error(e)
             throw e
         }
@@ -686,7 +686,7 @@ class SecuXWallet extends HdWalletCore implements AvaWalletCore {
             )
         }
 
-        store.commit('Ledger/closeModal')
+        store.commit('SecuX/closeModal')
         return signedTx
     }
 
@@ -749,7 +749,7 @@ class SecuXWallet extends HdWalletCore implements AvaWalletCore {
                 chainId
             )
         }
-        store.commit('Ledger/closeModal')
+        store.commit('SecuX/closeModal')
         return signedTx
     }
 
@@ -796,7 +796,7 @@ class SecuXWallet extends HdWalletCore implements AvaWalletCore {
         } else {
             txSigned = (await this.signTransactionHash(unsignedTx, paths, 'C')) as EvmTx
         }
-        store.commit('Ledger/closeModal')
+        store.commit('SecuX/closeModal')
         return txSigned
     }
 
@@ -817,7 +817,7 @@ class SecuXWallet extends HdWalletCore implements AvaWalletCore {
             let msgs = this.getEvmTransactionMessages(tx)
 
             // Open Modal Prompt
-            store.commit('Ledger/openModal', {
+            store.commit('SecuX/openModal', {
                 title: 'Transfer',
                 messages: msgs,
                 info: null,
@@ -826,7 +826,7 @@ class SecuXWallet extends HdWalletCore implements AvaWalletCore {
                 LEDGER_ETH_ACCOUNT_PATH,
                 rawUnsignedTx.toString('hex')
             )
-            store.commit('Ledger/closeModal')
+            store.commit('SecuX/closeModal')
 
             const signatureBN = {
                 v: new BN(signature.v, 16),
@@ -858,7 +858,7 @@ class SecuXWallet extends HdWalletCore implements AvaWalletCore {
             )
             return signedTx
         } catch (e) {
-            store.commit('Ledger/closeModal')
+            store.commit('SecuX/closeModal')
             console.error(e)
             throw e
         }
@@ -965,18 +965,18 @@ class SecuXWallet extends HdWalletCore implements AvaWalletCore {
         const addressPath = bippath.fromString(pathStr, false)
         const accountPath = bippath.fromString(`${AVA_ACCOUNT_PATH}`)
 
-        store.commit('Ledger/openModal', {
+        store.commit('SecuX/openModal', {
             title: `Sign Hash`,
             info: hash.toString('hex').toUpperCase(),
         })
 
         try {
             let sigMap = await this.app.signHash(accountPath, [addressPath], hash)
-            store.commit('Ledger/closeModal')
+            store.commit('SecuX/closeModal')
             let signed = sigMap.get(pathStr)
             return bintools.cb58Encode(signed)
         } catch (e) {
-            store.commit('Ledger/closeModal')
+            store.commit('SecuX/closeModal')
             throw e
         }
     }
