@@ -1,8 +1,9 @@
 // import AppBtc from "@ledgerhq/hw-app-btc";
 //@ts-ignore
-import AppAvax from '@obsidiansystems/hw-app-avalanche'
+import AppAvax from '@obsidiansystems/hwse-app-avalanche'
 //@ts-ignore
-import { SecuxETH } from '@secux/app-eth'
+
+import { SecuxTransactionTool } from "@secux/protocol-transaction";
 
 import EthereumjsCommon from '@ethereumjs/common'
 import { Transaction } from '@ethereumjs/tx'
@@ -54,7 +55,7 @@ import {
 import { Credential, SigIdx, Signature, UTXOResponse, Address } from 'avalanche/dist/common'
 import { getPreferredHRP, PayloadBase } from 'avalanche/dist/utils'
 import { HdWalletCore } from '@/js/wallets/HdWalletCore'
-import { ILedgerAppConfig } from '@/store/types'
+import { ISecuXConfig } from '@/store/types'
 import { WalletNameType } from '@/js/wallets/types'
 import { bnToBig, digestMessage } from '@/helpers/helper'
 import { abiDecoder, web3 } from '@/evm'
@@ -75,14 +76,14 @@ class SecuXWallet extends HdWalletCore implements AvaWalletCore {
 
     ethAddress: string
     ethBalance: BN
-    config: ILedgerAppConfig
+    config: ISecuXConfig
     ethHdNode: HDKey
 
-    constructor(app: AppAvax, hdkey: HDKey, config: ILedgerAppConfig, hdEth: HDKey, ethApp: Eth) {
+    constructor(app: AppAvax, hdkey: HDKey, config: ISecuXConfig, hdEth: HDKey, ethApp: Eth) {
         super(hdkey, hdEth)
         this.app = app
         this.ethApp = ethApp
-        this.type = 'ledger'
+        this.type = 'SecuX'
         this.config = config
         this.ethHdNode = hdEth
 
@@ -97,19 +98,35 @@ class SecuXWallet extends HdWalletCore implements AvaWalletCore {
         }
     }
 
-    static async fromApp(app, eth, config: ILedgerAppConfig) {
-        let res = await app.getWalletExtendedPublicKey(AVA_ACCOUNT_PATH)
+    static async fromApp(app, eth, transport, config: ISecuXConfig) {
+
+        const path = LEDGER_ETH_ACCOUNT_PATH;
+        const buffer = eth.prepareAddress(path);
+        const response = await transport.Exchange(buffer);
+        const address = eth.resolveAddress(response, path);
+
+        let ethRes = await transport.getXPublickey(path, false)
+
+        // let ethRes = await eth.getAddress(LEDGER_ETH_ACCOUNT_PATH, true, true)
+
+        // res = await app.getWalletExtendedPublicKey(AVA_ACCOUNT_PATH)
+        let res = await transport.getXPublickey(AVA_ACCOUNT_PATH, false)
 
         let hd = new HDKey()
-        hd.publicKey = res.public_key
-        hd.chainCode = res.chain_code
-
-        let ethRes = await eth.getAddress(LEDGER_ETH_ACCOUNT_PATH, true, true)
+        hd.publicKey = res.publicKey
+        hd.chainCode = res.chainCode
         let hdEth = new HDKey()
+        // // @ts-ignore
+        // hdEth.publicKey = Buffer.from(ethRes.publicKey, 'hex')
+        // // @ts-ignore
+        // hdEth.chainCode = Buffer.from(ethRes.chainCode, 'hex')
         // @ts-ignore
-        hdEth.publicKey = Buffer.from(ethRes.publicKey, 'hex')
+        hdEth.publicKey = ethRes.publicKey
         // @ts-ignore
-        hdEth.chainCode = Buffer.from(ethRes.chainCode, 'hex')
+        hdEth.chainCode = ethRes.chainCode
+   
+
+
 
         return new SecuXWallet(app, hd, config, hdEth, eth)
     }

@@ -24,7 +24,7 @@ import Spinner from '@/components/misc/Spinner.vue'
 import LedgerBlock from '@/components/modals/LedgerBlock.vue'
 import { SecuXWallet, MIN_EVM_SUPPORT_V } from '@/js/wallets/SecuXWallet'
 import { AVA_ACCOUNT_PATH, LEDGER_ETH_ACCOUNT_PATH } from '@/js/wallets/MnemonicWallet'
-import { ILedgerAppConfig } from '@/store/types'
+import { ISecuXConfig } from '@/store/types'
 import { LEDGER_EXCHANGE_TIMEOUT } from '@/store/modules/ledger/types'
 import ImageDayNight from '@/components/misc/ImageDayNight.vue'
 
@@ -37,7 +37,11 @@ import ImageDayNight from '@/components/misc/ImageDayNight.vue'
 })
 export default class SecuXButton extends Vue {
     isLoading: boolean = false
-    config?: ILedgerAppConfig = undefined
+    config?: ISecuXConfig = {
+    version: '2.8.1',
+    commit: 'string',
+    name: 'Avalanche'
+}
 
     destroyed() {
         this.$store.commit('SecuX/closeModal')
@@ -53,13 +57,14 @@ export default class SecuXButton extends Vue {
             let transport = await this.getTransport()
             await transport.Connect()
 
-            const address = await SecuxETH.getAddress(transport, "m/44'/60'/0'/0/0");
-            // let app = new AppAvax(transport, 'w0w')
-
             // Close the initial prompt modal if exists
             this.$store.commit('SecuX/setIsUpgradeRequired', false)
             this.isLoading = true
-
+            this.config = {
+            version: '2.8.1',
+            commit: 'string',
+            name: 'Avalanche'
+            }
             if (!this.config) {
                 this.$store.commit('SecuX/setIsUpgradeRequired', true)
                 this.isLoading = false
@@ -89,7 +94,7 @@ export default class SecuXButton extends Vue {
                 messages,
             })
 
-            let wallet = await SecuXWallet.fromApp( app, SecuxETH, transport )
+            let wallet = await SecuXWallet.fromApp( app, SecuxETH, transport, (this.config as unknown) as ISecuXConfig )
             // try {
             //     await this.loadWallet(wallet)
             //     this.onsuccess()

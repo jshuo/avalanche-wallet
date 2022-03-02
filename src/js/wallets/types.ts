@@ -42,7 +42,7 @@ export type ChainAlias = 'X' | 'P'
 export type AvmImportChainType = 'P' | 'C'
 export type AvmExportChainType = 'P' | 'C'
 
-export type WalletNameType = 'mnemonic' | 'ledger' | 'singleton'
+export type WalletNameType = 'mnemonic' | 'ledger' | 'singleton' | 'SecuX'
 export type WalletType = MnemonicWallet | LedgerWallet | SingletonWallet
 
 interface IAddressManager {
