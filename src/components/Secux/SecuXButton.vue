@@ -14,18 +14,16 @@
 <script lang="ts">
 import 'reflect-metadata'
 import { Component, Prop, Vue } from 'vue-property-decorator'
-
-
 // @ts-ignore
 import { SecuxWebUSB } from '@secux/transport-webusb'
 import { SecuxETH } from '@secux/app-eth'
-// import AppAvax from '@obsidiansystems/hw-app-avalanche'
+//@ts-ignore
+import AppAvax from '@secux/hw-app-avalanche'
 import Spinner from '@/components/misc/Spinner.vue'
 import LedgerBlock from '@/components/modals/LedgerBlock.vue'
 import { SecuXWallet, MIN_EVM_SUPPORT_V } from '@/js/wallets/SecuXWallet'
 import { AVA_ACCOUNT_PATH, LEDGER_ETH_ACCOUNT_PATH } from '@/js/wallets/MnemonicWallet'
 import { ISecuXConfig } from '@/store/types'
-import { LEDGER_EXCHANGE_TIMEOUT } from '@/store/modules/ledger/types'
 import ImageDayNight from '@/components/misc/ImageDayNight.vue'
 
 @Component({
@@ -38,10 +36,10 @@ import ImageDayNight from '@/components/misc/ImageDayNight.vue'
 export default class SecuXButton extends Vue {
     isLoading: boolean = false
     config?: ISecuXConfig = {
-    version: '2.8.1',
-    commit: 'string',
-    name: 'Avalanche'
-}
+        version: '2.8.1',
+        commit: 'string',
+        name: 'Avalanche',
+    }
 
     destroyed() {
         this.$store.commit('SecuX/closeModal')
@@ -56,15 +54,15 @@ export default class SecuXButton extends Vue {
         try {
             let transport = await this.getTransport()
             await transport.Connect()
-            let app = null
+            let app = new AppAvax(transport)
 
             // Close the initial prompt modal if exists
             this.$store.commit('SecuX/setIsUpgradeRequired', false)
             this.isLoading = true
             this.config = {
-            version: '2.8.1',
-            commit: 'string',
-            name: 'Avalanche'
+                version: '2.8.1',
+                commit: 'string',
+                name: 'Avalanche',
             }
             if (!this.config) {
                 this.$store.commit('SecuX/setIsUpgradeRequired', true)
@@ -95,13 +93,18 @@ export default class SecuXButton extends Vue {
                 messages,
             })
 
-            let wallet = await SecuXWallet.fromApp( app, SecuxETH, transport, (this.config as unknown) as ISecuXConfig )
-            // try {
+            let wallet = await SecuXWallet.fromApp(
+                app,
+                SecuxETH,
+                transport,
+                (this.config as unknown) as ISecuXConfig
+            )
+            try {
                 await this.loadWallet(wallet)
                 this.onsuccess()
-            // } catch (e) {
-            //     this.onerror(e)
-            // }
+            } catch (e) {
+                console.log(e) // this.onerror(e)
+            }
         } catch (e) {
             this.onerror(e)
         }

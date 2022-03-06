@@ -1,9 +1,9 @@
 // import AppBtc from "@ledgerhq/hw-app-btc";
 //@ts-ignore
-import AppAvax from '@obsidiansystems/hwse-app-avalanche'
+import AppAvax from '@secux/hw-app-avalanche'
 //@ts-ignore
 
-import { SecuxTransactionTool } from "@secux/protocol-transaction";
+// import { SecuxTransactionTool } from "@secux/protocol-transaction";
 
 import EthereumjsCommon from '@ethereumjs/common'
 import { Transaction } from '@ethereumjs/tx'
@@ -15,7 +15,7 @@ import { ava, avm, bintools, cChain, pChain } from '@/AVA'
 const bippath = require('bip32-path')
 import createHash from 'create-hash'
 import store from '@/store'
-import { importPublic, publicToAddress, bnToRlp, rlp } from 'ethereumjs-util'
+import { importPublic, publicToAddress, bnToRlp, bnToHex, rlp } from 'ethereumjs-util'
 
 import { UTXO as AVMUTXO, UTXO, UTXOSet as AVMUTXOSet } from 'avalanche/dist/apis/avm/utxos'
 import { AvaWalletCore } from '@/js/wallets/types'
@@ -62,7 +62,7 @@ import { abiDecoder, web3 } from '@/evm'
 import { AVA_ACCOUNT_PATH, ETH_ACCOUNT_PATH, LEDGER_ETH_ACCOUNT_PATH } from './MnemonicWallet'
 import { ChainIdType } from '@/constants'
 import { ParseableAvmTxEnum, ParseablePlatformEnum, ParseableEvmTxEnum } from '../TxHelper'
-import { ILedgerBlockMessage } from '../../store/modules/secux/types'
+import { ISecuXBlockMessage } from '../../store/modules/secux/types'
 import Erc20Token from '@/js/Erc20Token'
 import { WalletHelper } from '@/helpers/wallet_helper'
 import { Utils, NetworkHelper, Network } from '@avalabs/avalanche-wallet-sdk'
@@ -70,22 +70,30 @@ import { Utils, NetworkHelper, Network } from '@avalabs/avalanche-wallet-sdk'
 export const MIN_EVM_SUPPORT_V = '0.5.3'
 
 class SecuXWallet extends HdWalletCore implements AvaWalletCore {
-    app: AppAvax
-    ethApp: Eth
+    transport: any
     type: WalletNameType
-
+    app: AppAvax
     ethAddress: string
     ethBalance: BN
     config: ISecuXConfig
     ethHdNode: HDKey
+    eth: any
 
-    constructor(app: AppAvax, hdkey: HDKey, config: ISecuXConfig, hdEth: HDKey, ethApp: Eth) {
+    constructor(
+        app: AppAvax,
+        transport: any,
+        hdkey: HDKey,
+        config: ISecuXConfig,
+        hdEth: HDKey,
+        eth: any
+    ) {
         super(hdkey, hdEth)
-        this.app = app
-        this.ethApp = ethApp
-        this.type = 'Ledger'
+        this.transport = transport
+        this.eth = eth
+        this.type = 'SecuX'
         this.config = config
         this.ethHdNode = hdEth
+        this.app = app
 
         if (hdEth) {
             const ethKey = hdEth
@@ -98,17 +106,12 @@ class SecuXWallet extends HdWalletCore implements AvaWalletCore {
         }
     }
 
-    static async fromApp(app, eth, transport, config: ISecuXConfig) {
-
-        const path = LEDGER_ETH_ACCOUNT_PATH;
-        // const buffer = eth.prepareAddress(path);
+    static async fromApp(app: any, eth: any, transport: any, config: ISecuXConfig) {
+        // const buffer = eth.prepareAddress(LEDGER_ETH_ACCOUNT_PATH);
         // const response = await transport.Exchange(buffer);
-        // const address = eth.resolveAddress(response, path);
-
-        let ethRes = await transport.getXPublickey(path, false)
-
+        // const address = eth.resolveAddress(response, LEDGER_ETH_ACCOUNT_PATH);
+        let ethRes = await transport.getXPublickey(LEDGER_ETH_ACCOUNT_PATH, false)
         // let ethRes = await eth.getAddress(LEDGER_ETH_ACCOUNT_PATH, true, true)
-
         // res = await app.getWalletExtendedPublicKey(AVA_ACCOUNT_PATH)
         let res = await transport.getXPublickey(AVA_ACCOUNT_PATH, false)
 
@@ -116,19 +119,12 @@ class SecuXWallet extends HdWalletCore implements AvaWalletCore {
         hd.publicKey = res.publicKey
         hd.chainCode = res.chainCode
         let hdEth = new HDKey()
-        // // @ts-ignore
-        // hdEth.publicKey = Buffer.from(ethRes.publicKey, 'hex')
-        // // @ts-ignore
-        // hdEth.chainCode = Buffer.from(ethRes.chainCode, 'hex')
         // @ts-ignore
         hdEth.publicKey = ethRes.publicKey
         // @ts-ignore
         hdEth.chainCode = ethRes.chainCode
-   
-
-
-
-        return new SecuXWallet(app, hd, config, hdEth, eth)
+        // @ts-ignore
+        return new SecuXWallet(app, transport, hd, config, hdEth, eth)
     }
 
     // Returns an array of derivation paths that need to sign this transaction
@@ -235,7 +231,7 @@ class SecuXWallet extends HdWalletCore implements AvaWalletCore {
         const chainChangePath = this.getChangePath(chainId).split('m/')[1]
         let changeIdx = this.getChangeIndex(chainId)
         // If change and destination paths are the same
-        // it can cause ledger to not display the destination amt.
+        // it can cause secux to not display the destination amt.
         // Since platform helper does not have internal/external
         // path for change (it uses the next address)
         // there can be an address collisions.
@@ -358,7 +354,7 @@ class SecuXWallet extends HdWalletCore implements AvaWalletCore {
     }
 
     // Used for non parsable transactions.
-    // Ideally we wont use this function at all, but ledger is not ready yet.
+    // Ideally we wont use this function at all, but secux is not ready yet.
     async signTransactionHash<
         UnsignedTx extends AVMUnsignedTx | PlatformUnsignedTx | EVMUnsignedTx,
         SignedTx extends AVMTx | PlatformTx | EvmTx
@@ -375,10 +371,10 @@ class SecuXWallet extends HdWalletCore implements AvaWalletCore {
 
             let bip32Paths = this.pathsToUniqueBipPaths(paths)
 
-            // Sign the msg with ledger
+            // Sign the msg with secux
             const accountPathSource = chainId === 'C' ? ETH_ACCOUNT_PATH : AVA_ACCOUNT_PATH
             const accountPath = bippath.fromString(`${accountPathSource}`)
-            let sigMap = await this.app.signHash(accountPath, bip32Paths, msg)
+            let sigMap = await await this.app.signHash(accountPath, bip32Paths, msg)
             store.commit('SecuX/closeModal')
 
             let creds: Credential[] = this.getCredentials<UnsignedTx>(
@@ -441,14 +437,14 @@ class SecuXWallet extends HdWalletCore implements AvaWalletCore {
                 info: null,
             })
 
-            let ledgerSignedTx = await this.app.signTransaction(
+            let SecuXSignedTx = await this.app.signTransaction(
                 accountPath,
                 bip32Paths,
                 txbuff,
                 changePath
             )
 
-            let sigMap = ledgerSignedTx.signatures
+            let sigMap = SecuXSignedTx.signatures
             let creds = this.getCredentials<UnsignedTx>(unsignedTx, paths, sigMap, chainId)
 
             let signedTx
@@ -476,8 +472,8 @@ class SecuXWallet extends HdWalletCore implements AvaWalletCore {
         unsignedTx: UnsignedTx,
         chainId: ChainIdType,
         changePath: null | { toPathArray: () => number[] }
-    ): ILedgerBlockMessage[] {
-        let messages: ILedgerBlockMessage[] = []
+    ): ISecuXBlockMessage[] {
+        let messages: ISecuXBlockMessage[] = []
         let hrp = getPreferredHRP(ava.getNetworkID())
         let tx = unsignedTx.getTransaction()
         let txType = tx.getTxType()
@@ -539,13 +535,13 @@ class SecuXWallet extends HdWalletCore implements AvaWalletCore {
     getValidateDelegateMsgs<UnsignedTx extends AVMUnsignedTx | PlatformUnsignedTx>(
         unsignedTx: UnsignedTx,
         chainId: ChainIdType
-    ): ILedgerBlockMessage[] {
+    ): ISecuXBlockMessage[] {
         let tx =
             ((unsignedTx as
                 | AVMUnsignedTx
                 | PlatformUnsignedTx).getTransaction() as AddValidatorTx) || AddDelegatorTx
         let txType = tx.getTxType()
-        let messages: ILedgerBlockMessage[] = []
+        let messages: ISecuXBlockMessage[] = []
 
         if (
             (txType === PlatformVMConstants.ADDDELEGATORTX && chainId === 'P') ||
@@ -599,7 +595,7 @@ class SecuXWallet extends HdWalletCore implements AvaWalletCore {
     getFeeMsgs<UnsignedTx extends AVMUnsignedTx | PlatformUnsignedTx | EVMUnsignedTx>(
         unsignedTx: UnsignedTx,
         chainId: ChainIdType
-    ): ILedgerBlockMessage[] {
+    ): ISecuXBlockMessage[] {
         let tx = unsignedTx.getTransaction()
         let txType = tx.getTxType()
         let messages = []
@@ -624,8 +620,8 @@ class SecuXWallet extends HdWalletCore implements AvaWalletCore {
         unsignedTx: UnsignedTx,
         chainId: ChainIdType,
         changePath: null | { toPathArray: () => number[] }
-    ): ILedgerBlockMessage[] {
-        let messages: ILedgerBlockMessage[] = []
+    ): ISecuXBlockMessage[] {
+        let messages: ISecuXBlockMessage[] = []
 
         const outputMessages = this.getOutputMsgs(unsignedTx, chainId, changePath)
         messages.push(...outputMessages)
@@ -642,29 +638,29 @@ class SecuXWallet extends HdWalletCore implements AvaWalletCore {
         return messages
     }
 
-    getEvmTransactionMessages(tx: Transaction): ILedgerBlockMessage[] {
+    getEvmTransactionMessages(tx: Transaction): ISecuXBlockMessage[] {
         let gasPrice = tx.gasPrice
         let gasLimit = tx.gasLimit
         let totFee = gasPrice.mul(new BN(gasLimit))
         let feeNano = Utils.bnToBig(totFee, 9)
 
-        let msgs: ILedgerBlockMessage[] = []
+        let msgs: ISecuXBlockMessage[] = []
         try {
             let test = '0x' + tx.data.toString('hex')
             let data = abiDecoder.decodeMethod(test)
 
-            let callMsg: ILedgerBlockMessage = {
+            let callMsg: ISecuXBlockMessage = {
                 title: 'Contract Call',
                 value: data.name,
             }
-            let paramMsgs: ILedgerBlockMessage[] = data.params.map((param: any) => {
+            let paramMsgs: ISecuXBlockMessage[] = data.params.map((param: any) => {
                 return {
                     title: param.name,
                     value: param.value,
                 }
             })
 
-            let feeMsg: ILedgerBlockMessage = {
+            let feeMsg: ISecuXBlockMessage = {
                 title: 'Fee',
                 value: feeNano.toLocaleString() + ' nAVAX',
             }
@@ -684,12 +680,12 @@ class SecuXWallet extends HdWalletCore implements AvaWalletCore {
         let parseableTxs = ParseableAvmTxEnum
         let { paths, isAvaxOnly } = this.getTransactionPaths<AVMUnsignedTx>(unsignedTx, chainId)
 
-        // If ledger doesnt support parsing, sign hash
-        let canLedgerParse = this.config.version >= '0.3.1'
+        // If SecuX doesnt support parsing, sign hash
+        let canSecuXParse = this.config.version >= '2.8.0'
         let isParsableType = txType in parseableTxs && isAvaxOnly
 
         let signedTx
-        if (canLedgerParse && isParsableType) {
+        if (canSecuXParse && isParsableType) {
             signedTx = await this.signTransactionParsable<AVMUnsignedTx, AVMTx>(
                 unsignedTx,
                 paths,
@@ -717,43 +713,43 @@ class SecuXWallet extends HdWalletCore implements AvaWalletCore {
             unsignedTx,
             chainId
         )
-        // If ledger doesnt support parsing, sign hash
-        let canLedgerParse = this.config.version >= '0.3.1'
+        // If SecuX doesnt support parsing, sign hash
+        let canSecuXParse = this.config.version >= '0.3.1'
         let isParsableType = txType in parseableTxs && isAvaxOnly
 
-        // TODO: Remove after ledger is fixed
+        // TODO: Remove after SecuX is fixed
         // If UTXOS contain lockedStakeable funds always use sign hash
         let txIns = unsignedTx.getTransaction().getIns()
         for (var i = 0; i < txIns.length; i++) {
             let typeID = txIns[i].getInput().getTypeID()
             if (typeID === PlatformVMConstants.STAKEABLELOCKINID) {
-                canLedgerParse = false
+                canSecuXParse = false
                 break
             }
         }
 
-        // TODO: Remove after ledger update
-        // Ledger is not able to parse P/C atomic transactions
+        // TODO: Remove after SecuX update
+        // SecuX is not able to parse P/C atomic transactions
         if (txType === PlatformVMConstants.EXPORTTX) {
             const destChainBuff = (tx as PlatformExportTx).getDestinationChain()
             // If destination chain is C chain, sign hash
             const destChain = Network.idToChainAlias(bintools.cb58Encode(destChainBuff))
             if (destChain === 'C') {
-                canLedgerParse = false
+                canSecuXParse = false
             }
         }
-        // TODO: Remove after ledger update
+        // TODO: Remove after SecuX update
         if (txType === PlatformVMConstants.IMPORTTX) {
             const sourceChainBuff = (tx as PlatformImportTx).getSourceChain()
             // If destination chain is C chain, sign hash
             const sourceChain = Network.idToChainAlias(bintools.cb58Encode(sourceChainBuff))
             if (sourceChain === 'C') {
-                canLedgerParse = false
+                canSecuXParse = false
             }
         }
 
         let signedTx
-        if (canLedgerParse && isParsableType) {
+        if (canSecuXParse && isParsableType) {
             signedTx = await this.signTransactionParsable<PlatformUnsignedTx, PlatformTx>(
                 unsignedTx,
                 paths,
@@ -776,7 +772,7 @@ class SecuXWallet extends HdWalletCore implements AvaWalletCore {
         let tx = unsignedTx.getTransaction()
         let typeId = tx.getTxType()
 
-        let canLedgerParse = true
+        let canSecuXParse = true
 
         let paths = ['0/0']
         if (typeId === EVMConstants.EXPORTTX) {
@@ -787,28 +783,28 @@ class SecuXWallet extends HdWalletCore implements AvaWalletCore {
             paths = ins.map((input) => '0/0')
         }
 
-        // TODO: Remove after ledger update
-        // Ledger is not able to parse P/C atomic transactions
+        // TODO: Remove after SecuX update
+        // SecuX is not able to parse P/C atomic transactions
         if (typeId === EVMConstants.EXPORTTX) {
             const destChainBuff = (tx as EVMExportTx).getDestinationChain()
             // If destination chain is C chain, sign hash
             const destChain = Network.idToChainAlias(bintools.cb58Encode(destChainBuff))
             if (destChain === 'P') {
-                canLedgerParse = false
+                canSecuXParse = false
             }
         }
-        // TODO: Remove after ledger update
+        // TODO: Remove after SecuX update
         if (typeId === EVMConstants.IMPORTTX) {
             const sourceChainBuff = (tx as EVMImportTx).getSourceChain()
             // If destination chain is C chain, sign hash
             const sourceChain = Network.idToChainAlias(bintools.cb58Encode(sourceChainBuff))
             if (sourceChain === 'P') {
-                canLedgerParse = false
+                canSecuXParse = false
             }
         }
 
         let txSigned
-        if (canLedgerParse) {
+        if (canSecuXParse) {
             txSigned = (await this.signTransactionParsable(unsignedTx, paths, 'C')) as EvmTx
         } else {
             txSigned = (await this.signTransactionHash(unsignedTx, paths, 'C')) as EvmTx
@@ -839,19 +835,27 @@ class SecuXWallet extends HdWalletCore implements AvaWalletCore {
                 messages: msgs,
                 info: null,
             })
-            const signature = await this.ethApp.signTransaction(
+
+            const chainId = await web3.eth.getChainId()
+            const response = await this.eth.signTransaction(
+                this.transport,
                 LEDGER_ETH_ACCOUNT_PATH,
-                rawUnsignedTx.toString('hex')
+                {
+                    chainId: chainId,
+                    nonce: tx.nonce.toNumber(),
+                    gasPrice: tx.gasPrice.toNumber(),
+                    gasLimit: tx.gasLimit.toNumber(),
+                    to: tx.to?.toString(),
+                    value: bnToHex(tx.value),
+                }
             )
             store.commit('SecuX/closeModal')
 
             const signatureBN = {
-                v: new BN(signature.v, 16),
-                r: new BN(signature.r, 16),
-                s: new BN(signature.s, 16),
+                v: new BN(response.signature.slice(64), 16),
+                r: new BN(response.signature.slice(0, 32), 16),
+                s: new BN(response.signature.slice(32, 64), 16),
             }
-
-            const chainId = await web3.eth.getChainId()
             const networkId = await web3.eth.net.getId()
             const chainParams = {
                 common: EthereumjsCommon.forCustomChain(
@@ -988,7 +992,7 @@ class SecuXWallet extends HdWalletCore implements AvaWalletCore {
         })
 
         try {
-            let sigMap = await this.app.signHash(accountPath, [addressPath], hash)
+            let sigMap = await this.transport.signHash(accountPath, [addressPath], hash)
             store.commit('SecuX/closeModal')
             let signed = sigMap.get(pathStr)
             return bintools.cb58Encode(signed)
