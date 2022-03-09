@@ -71,7 +71,7 @@ export const MIN_EVM_SUPPORT_V = '0.5.3'
 
 class SecuXWallet extends HdWalletCore implements AvaWalletCore {
     transport: any
-    type: WalletNameType
+    type: WalletNameType = "SecuX"
     app: AppAvax
     ethAddress: string
     ethBalance: BN
@@ -421,11 +421,7 @@ class SecuXWallet extends HdWalletCore implements AvaWalletCore {
         let title = `Sign ${parseableTxs[txType]}`
 
         let bip32Paths = this.pathsToUniqueBipPaths(paths)
-
-        const accountPath =
-            chainId === 'C'
-                ? bippath.fromString(`${ETH_ACCOUNT_PATH}`)
-                : bippath.fromString(`${AVA_ACCOUNT_PATH}`)
+        const accountPathSource = chainId === 'C' ? ETH_ACCOUNT_PATH : AVA_ACCOUNT_PATH
         let txbuff = unsignedTx.toBuffer()
         let changePath = this.getChangeBipPath(unsignedTx, chainId)
         let messages = this.getTransactionMessages<UnsignedTx>(unsignedTx, chainId, changePath)
@@ -438,10 +434,9 @@ class SecuXWallet extends HdWalletCore implements AvaWalletCore {
             })
 
             let SecuXSignedTx = await this.app.signTransaction(
-                accountPath,
-                bip32Paths,
+                accountPathSource,
+                paths,
                 txbuff,
-                changePath
             )
 
             let sigMap = SecuXSignedTx.signatures
