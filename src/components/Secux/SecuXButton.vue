@@ -46,7 +46,12 @@ export default class SecuXButton extends Vue {
     }
 
     async getTransport() {
-        let transport = await SecuxWebUSB.Create()
+        let transport = await SecuxWebUSB.Create(    
+            () => console.log("connected"),
+            async () => {
+                console.log("disconnected")
+                await this.$store.dispatch('logout')
+            })
         return transport
     }
 
@@ -158,6 +163,7 @@ export default class SecuXButton extends Vue {
             message: 'Failed to get public key from ledger device.',
         })
     }
+
 }
 </script>
 <style scoped lang="scss">
