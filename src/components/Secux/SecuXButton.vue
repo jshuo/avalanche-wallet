@@ -5,7 +5,7 @@
             <ImageDayNight
                 day="/img/access_icons/day/secux.svg"
                 night="/img/access_icons/night/secux.svg"
-                class="ledger_img"
+                class="secux_img"
             ></ImageDayNight>
         </template>
         <Spinner v-else class="spinner"></Spinner>
@@ -22,7 +22,7 @@ import AppAvax from '@secux/hw-app-avalanche'
 import Spinner from '@/components/misc/Spinner.vue'
 import LedgerBlock from '@/components/modals/LedgerBlock.vue'
 import { SecuXWallet, MIN_EVM_SUPPORT_V } from '@/js/wallets/SecuXWallet'
-import { AVA_ACCOUNT_PATH, LEDGER_ETH_ACCOUNT_PATH } from '@/js/wallets/MnemonicWallet'
+import { AVA_ACCOUNT_PATH, SECUX_ETH_ACCOUNT_PATH } from '@/js/wallets/MnemonicWallet'
 import { ISecuXConfig } from '@/store/types'
 import ImageDayNight from '@/components/misc/ImageDayNight.vue'
 
@@ -89,7 +89,7 @@ export default class SecuXButton extends Vue {
                 },
                 {
                     title: 'Derivation Path',
-                    value: LEDGER_ETH_ACCOUNT_PATH,
+                    value: SECUX_ETH_ACCOUNT_PATH,
                 },
             ]
 
@@ -160,7 +160,7 @@ export default class SecuXButton extends Vue {
         this.$store.dispatch('Notifications/add', {
             type: 'error',
             title: 'SecuX Access Failed',
-            message: 'Failed to get public key from ledger device.',
+            message: 'Failed to get public key from SecuX device.',
         })
     }
 
@@ -172,9 +172,9 @@ export default class SecuXButton extends Vue {
     color: inherit;
 }
 
-.ledger_img {
-    width: 24px;
-    height: 24px;
+.secux_img {
+    width: 40px;
+    height: 40px;
     object-fit: contain;
 }
 
