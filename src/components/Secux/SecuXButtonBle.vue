@@ -1,7 +1,7 @@
 <template>
     <button class="button_primary" @click="submit">
         <template v-if="!isLoading">
-            SecuX Web Bluetooth
+            SecuX Web Bluetooth (Experimental feature for VR)
             <ImageDayNight
                 day="/img/access_icons/day/secux.svg"
                 night="/img/access_icons/night/secux.svg"
