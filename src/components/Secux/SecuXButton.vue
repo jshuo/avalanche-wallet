@@ -20,7 +20,6 @@ import { SecuxETH } from '@secux/app-eth'
 //@ts-ignore
 import AppAvax from '@secux/hw-app-avalanche'
 import Spinner from '@/components/misc/Spinner.vue'
-import LedgerBlock from '@/components/modals/LedgerBlock.vue'
 import { SecuXWallet, MIN_EVM_SUPPORT_V } from '@/js/wallets/SecuXWallet'
 import { AVA_ACCOUNT_PATH, SECUX_ETH_ACCOUNT_PATH } from '@/js/wallets/MnemonicWallet'
 import { ISecuXConfig } from '@/store/types'
@@ -30,7 +29,6 @@ import ImageDayNight from '@/components/misc/ImageDayNight.vue'
     components: {
         ImageDayNight,
         Spinner,
-        LedgerBlock,
     },
 })
 export default class SecuXButton extends Vue {
