@@ -88,7 +88,7 @@ export default class SecuXButtonBle extends Vue {
                 },
                 {
                     title: 'Derivation Path',
-                    value: LEDGER_ETH_ACCOUNT_PATH,
+                    value: SECUX_ETH_ACCOUNT_PATH,
                 },
             ]
 
