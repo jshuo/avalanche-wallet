@@ -1,7 +1,7 @@
 <template>
     <button class="button_primary" @click="submit">
         <template v-if="!isLoading">
-            SecuX Web Bluetooth (Experimental feature for VR)
+            SecuX Web Bluetooth (VR Experiments)
             <ImageDayNight
                 day="/img/access_icons/day/secux.svg"
                 night="/img/access_icons/night/secux.svg"
@@ -44,12 +44,13 @@ export default class SecuXButtonBle extends Vue {
     }
 
     async getTransport() {
-        let transport = await SecuxWebBLE.Create(    
-            () => console.log("connected"),
+        let transport = await SecuxWebBLE.Create(
+            () => console.log('connected'),
             async () => {
-                console.log("disconnected")
+                console.log('disconnected')
                 await this.$store.dispatch('logout')
-            })
+            }
+        )
         return transport
     }
 
@@ -57,7 +58,7 @@ export default class SecuXButtonBle extends Vue {
         try {
             let transport = await this.getTransport()
             await transport.Connect()
-            await transport.SendOTP('42960705');
+            await transport.SendOTP('42960705')
             let app = new AppAvax(transport)
 
             // Close the initial prompt modal if exists
@@ -162,7 +163,6 @@ export default class SecuXButtonBle extends Vue {
             message: 'Failed to get public key from SecuX device.',
         })
     }
-
 }
 </script>
 <style scoped lang="scss">

@@ -70,7 +70,7 @@ import { Utils, NetworkHelper, Network } from '@avalabs/avalanche-wallet-sdk'
 export const MIN_EVM_SUPPORT_V = '0.5.3'
 
 class SecuXWallet extends HdWalletCore implements AvaWalletCore {
-    type: WalletNameType = "SecuX"
+    type: WalletNameType = 'SecuX'
     ethAddress: string
     ethBalance: BN
 
@@ -418,11 +418,7 @@ class SecuXWallet extends HdWalletCore implements AvaWalletCore {
                 info: null,
             })
 
-            let SecuXSignedTx = await this.app.signTransaction(
-                accountPathSource,
-                paths,
-                txbuff,
-            )
+            let SecuXSignedTx = await this.app.signTransaction(accountPathSource, paths, txbuff)
 
             let sigMap = SecuXSignedTx.signatures
             let creds = this.getCredentials<UnsignedTx>(unsignedTx, paths, sigMap, chainId)
