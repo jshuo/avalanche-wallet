@@ -51,6 +51,6 @@ export default class Access extends Vue {}
 }
 
 .access_card {
-    text-align: center;
+    text-align: left;
 }
 </style>
