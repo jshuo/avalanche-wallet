@@ -1,14 +1,16 @@
 <template>
     <p>
-        By using this application you agree to the
-        <router-link to="/legal">Terms of Use</router-link>
-        .
+        Notes: 
+            <ul>
+            <li>This application is a fork of Avalanche WebWallet and modified for SecuX Wallet and Customers ONLY</li>
+            <li>To avoid phishing attacks, you never enter or submit recovery phrase by using this application. Please connect your SecuX hardware wallet when accessing or transferring your Avalanche assets</li>
+            </ul>
     </p>
 </template>
 <style scoped lang="scss">
 p {
-    color: var(--primary-color-light);
-    font-size: 13px;
+    color: var(--primary-color-dark);
+    font-size: 15px;
 }
 a {
     color: var(--primary-color) !important;

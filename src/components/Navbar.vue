@@ -17,9 +17,6 @@
                 <router-link to="/access" class="action_but" data-cy="access">
                     {{ $t('nav.access') }}
                 </router-link>
-                <router-link to="/create" class="action_but" data-cy="create">
-                    {{ $t('nav.create') }}
-                </router-link>
             </template>
             <network-menu></network-menu>
             <LanguageSelect class="lang_web"></LanguageSelect>

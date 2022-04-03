@@ -1,32 +1,9 @@
 <template>
     <div class="access_card">
-        <h1>{{ $t('access.title') }}</h1>
-        <router-link to="/create" class="link">{{ $t('access.create') }}</router-link>
         <div class="menus">
             <AccountsFound class="accounts_menu"></AccountsFound>
             <div class="options">
-                <router-link to="/access/privatekey" class="menu_option button_primary">
-                    {{ $t('access.but_private_key') }}
-                    <ImageDayNight
-                        day="/img/access_icons/day/privatekey.svg"
-                        night="/img/access_icons/night/privatekey.svg"
-                    ></ImageDayNight>
-                </router-link>
-                <router-link to="/access/mnemonic" class="menu_option button_primary">
-                    {{ $t('access.but_mnemonic') }}
-                    <ImageDayNight
-                        day="/img/access_icons/day/mnemonic.svg"
-                        night="/img/access_icons/night/mnemonic.svg"
-                    ></ImageDayNight>
-                </router-link>
-                <router-link to="/access/keystore" class="menu_option button_primary">
-                    {{ $t('access.but_keystore') }}
-                    <ImageDayNight
-                        day="/img/access_icons/day/keystore.svg"
-                        night="/img/access_icons/night/keystore.svg"
-                    ></ImageDayNight>
-                </router-link>
-                <LedgerButton class="menu_option button_primary"></LedgerButton>
+                <SecuXButton class="menu_option button_primary"></SecuXButton>
                 <SecuXButton class="menu_option button_primary"></SecuXButton>
                 <!--            <TorusGoogle class="option button_primary" text="Google"></TorusGoogle>-->
             </div>

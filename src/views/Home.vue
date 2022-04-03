@@ -4,21 +4,9 @@
             <b-row>
                 <b-col>
                     <div class="home_wrapper">
-                        <h1>{{ $t('home.desc') }}</h1>
+                        <h1><strong>{{ 'For Use of Accessing Avalanche assets with SecuX Hardware Only'}}</strong></h1>
                         <div class="login_wrapper">
                             <div class="login_option">
-                                <header>
-                                    <div class="img_container">
-                                        <img
-                                            v-if="$root.theme === 'day'"
-                                            src="@/assets/diamond-primary.svg"
-                                            alt
-                                        />
-                                        <img v-else src="@/assets/diamond-primary-night.svg" alt />
-                                    </div>
-                                    <h2>{{ $t('home.access.title') }}</h2>
-                                    <p>{{ $t('home.access.desc') }}</p>
-                                </header>
                                 <div>
                                     <router-link
                                         data-cy="access"
@@ -26,33 +14,6 @@
                                         class="ava_button button_primary submit_but"
                                     >
                                         {{ $t('home.access.submit') }}
-                                    </router-link>
-                                </div>
-                            </div>
-                            <div class="login_option">
-                                <header>
-                                    <div class="img_container">
-                                        <img
-                                            v-if="$root.theme === 'day'"
-                                            src="@/assets/diamond-secondary.png"
-                                            alt
-                                        />
-                                        <img
-                                            v-else
-                                            src="@/assets/diamond-secondary-night.svg"
-                                            alt
-                                        />
-                                    </div>
-                                    <h2>{{ $t('home.create.title') }}</h2>
-                                    <p>{{ $t('home.create.desc') }}</p>
-                                </header>
-                                <div>
-                                    <router-link
-                                        data-cy="create"
-                                        to="/create"
-                                        class="ava_button button_secondary submit_but"
-                                    >
-                                        {{ $t('home.create.submit') }}
                                     </router-link>
                                 </div>
                             </div>
@@ -109,14 +70,13 @@ export default class Home extends Vue {}
         .login_wrapper {
             margin-top: 60px;
             display: grid;
-            grid-template-columns: 1fr 1fr;
             column-gap: main.$container-padding;
 
             .login_option {
                 display: flex;
                 flex-direction: column;
                 border-radius: 2px;
-                align-items: flex-start;
+                align-items: center;
                 justify-content: space-between;
                 background-color: var(--bg-light);
                 padding: 60px 90px main.$container-padding main.$container-padding;
@@ -211,6 +171,7 @@ img {
                 grid-template-columns: none;
                 display: flex;
                 flex-direction: column;
+
 
                 .login_option {
                     margin-bottom: main.$vertical-padding;

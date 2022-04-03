@@ -1,13 +1,14 @@
 <template>
     <button class="button_primary" @click="submit">
         <template v-if="!isLoading">
-            SecuX
+            <strong> SecuX Wallet </strong>
             <ImageDayNight
                 day="/img/access_icons/day/secux.svg"
                 night="/img/access_icons/night/secux.svg"
                 class="secux_img"
             ></ImageDayNight>
         </template>
+        
         <Spinner v-else class="spinner"></Spinner>
     </button>
 </template>
