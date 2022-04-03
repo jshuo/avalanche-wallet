@@ -4,7 +4,13 @@
             <b-row>
                 <b-col>
                     <div class="home_wrapper">
-                        <h1><strong>{{ 'For Use of Accessing Avalanche assets with SecuX Hardware Only'}}</strong></h1>
+                        <h1>
+                            <strong>
+                                {{
+                                    'For Use of Accessing Avalanche assets with SecuX Hardware Only'
+                                }}
+                            </strong>
+                        </h1>
                         <div class="login_wrapper">
                             <div class="login_option">
                                 <div>
@@ -171,8 +177,6 @@ img {
                 grid-template-columns: none;
                 display: flex;
                 flex-direction: column;
-
-
                 .login_option {
                     margin-bottom: main.$vertical-padding;
                     padding: 30px 15px;
