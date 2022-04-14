@@ -66,7 +66,6 @@
                 </template>
                 <template v-else>
                     <router-link to="/access">{{ $t('nav.access') }}</router-link>
-                    <router-link to="/create">{{ $t('nav.create') }}</router-link>
                 </template>
                 <div class="mobile_bottom">
                     <AccountMenu></AccountMenu>
