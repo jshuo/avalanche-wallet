@@ -232,7 +232,7 @@ class SecuXWallet extends HdWalletCore implements AvaWalletCore {
             changeIdx = this.platformHelper.getFirstAvailableIndex()
         }
 
-        return (`${AVA_ACCOUNT_PATH}/${chainChangePath}/${changeIdx}`)
+        return `${AVA_ACCOUNT_PATH}/${chainChangePath}/${changeIdx}`
     }
 
     getCredentials<UnsignedTx extends AVMUnsignedTx | PlatformUnsignedTx | EVMUnsignedTx>(
@@ -409,7 +409,11 @@ class SecuXWallet extends HdWalletCore implements AvaWalletCore {
         const accountPathSource = chainId === 'C' ? ETH_ACCOUNT_PATH : AVA_ACCOUNT_PATH
         let txbuff = unsignedTx.toBuffer()
         let changePath = this.getChangeBipPath(unsignedTx, chainId)
-        let messages = this.getTransactionMessages<UnsignedTx>(unsignedTx, chainId, bippath.fromString(changePath))
+        let messages = this.getTransactionMessages<UnsignedTx>(
+            unsignedTx,
+            chainId,
+            bippath.fromString(changePath)
+        )
 
         try {
             store.commit('SecuX/openModal', {
@@ -418,7 +422,12 @@ class SecuXWallet extends HdWalletCore implements AvaWalletCore {
                 info: null,
             })
 
-            let SecuXSignedTx = await this.app.signTransaction(accountPathSource, paths, changePath, txbuff)
+            let SecuXSignedTx = await this.app.signTransaction(
+                accountPathSource,
+                paths,
+                changePath,
+                txbuff
+            )
 
             let sigMap = SecuXSignedTx.signatures
             let creds = this.getCredentials<UnsignedTx>(unsignedTx, paths, sigMap, chainId)
