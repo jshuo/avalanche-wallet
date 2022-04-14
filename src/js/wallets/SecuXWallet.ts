@@ -404,15 +404,14 @@ class SecuXWallet extends HdWalletCore implements AvaWalletCore {
         }[chainId]
 
         let title = `Sign ${parseableTxs[txType]}`
-
-        let bip32Paths = this.pathsToUniqueBipPaths(paths)
         const accountPathSource = chainId === 'C' ? ETH_ACCOUNT_PATH : AVA_ACCOUNT_PATH
         let txbuff = unsignedTx.toBuffer()
         let changePath = this.getChangeBipPath(unsignedTx, chainId)
+        let changePathString = changePath !== null ? bippath.fromString(changePath) : null
         let messages = this.getTransactionMessages<UnsignedTx>(
             unsignedTx,
             chainId,
-            bippath.fromString(changePath)
+            changePathString
         )
 
         try {
