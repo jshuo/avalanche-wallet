@@ -14,6 +14,7 @@ const secux_module: Module<SecuXState, RootState> = {
         title: 'title',
         info: `info'`,
         Transport: {},
+        totalBalance: '',
     },
     mutations: {
         openModal(state, input) {
@@ -36,12 +37,16 @@ const secux_module: Module<SecuXState, RootState> = {
         setTransport(state, val) {
             state.Transport = val
         },
+        setTotalBalance(state, val) {
+            state.totalBalance = val
+        },
     },
     actions: {
         async updateTotalBalance({ state, dispatch, commit, getters, rootState }, data) {
             console.log(data)
+            commit('setTotalBalance', data.totalBalance)
             await SecuxScreenDevice.SetAccount(state.Transport, {
-                name: 'AVAX1',
+                name: 'AVAX on SecuX',
                 path: "m/44'/9000'/0'",
                 balance: data.totalBalance,
             })

@@ -12,6 +12,7 @@ export interface SecuXState {
     title: string
     info: string
     Transport:{}
+    totalBalance: string
 }
 
 export const LEDGER_EXCHANGE_TIMEOUT = 90_000
