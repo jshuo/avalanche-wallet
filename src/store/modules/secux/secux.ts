@@ -1,6 +1,7 @@
 import { Module } from 'vuex'
 import { RootState } from '@/store/types'
 import { SecuXState } from '@/store/modules/secux/types'
+const { SecuxScreenDevice } = require('@secux/protocol-device/lib/protocol-screendevice')
 
 const secux_module: Module<SecuXState, RootState> = {
     namespaced: true,
@@ -12,6 +13,7 @@ const secux_module: Module<SecuXState, RootState> = {
         messages: [],
         title: 'title',
         info: `info'`,
+        Transport: {},
     },
     mutations: {
         openModal(state, input) {
@@ -31,8 +33,20 @@ const secux_module: Module<SecuXState, RootState> = {
         setIsWalletLoading(state, val) {
             state.isWalletLoading = val
         },
+        setTransport(state, val) {
+            state.Transport = val
+        },
     },
-    actions: {},
+    actions: {
+        async updateTotalBalance({ state, dispatch, commit, getters, rootState }, data) {
+            console.log(data)
+            await SecuxScreenDevice.SetAccount(state.Transport, {
+                name: 'AVAX1',
+                path: "m/44'/9000'/0'",
+                balance: data.totalBalance,
+            })
+        },
+    },
 }
 
 export default secux_module

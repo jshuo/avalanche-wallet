@@ -197,6 +197,10 @@ export default class BalanceCard extends Vue {
     get balanceText(): string {
         if (this.ava_asset !== null) {
             let denom = this.ava_asset.denomination
+            this.$store.dispatch('SecuX/updateTotalBalance', {
+                totalBalance: this.totalBalanceBig.toLocaleString(denom),
+            })
+
             return this.totalBalanceBig.toLocaleString(denom)
         } else {
             return '?'

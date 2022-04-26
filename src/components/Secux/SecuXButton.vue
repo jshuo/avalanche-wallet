@@ -27,6 +27,7 @@ import { SecuXWallet, MIN_MCU_FW_SUPPORT_V } from '@/js/wallets/SecuXWallet'
 import { AVA_ACCOUNT_PATH, SECUX_ETH_ACCOUNT_PATH } from '@/js/wallets/MnemonicWallet'
 import { ISecuXConfig } from '@/store/types'
 import ImageDayNight from '@/components/misc/ImageDayNight.vue'
+import AvaAsset from '@/js/AvaAsset'
 
 @Component({
     components: {
@@ -58,6 +59,8 @@ export default class SecuXButton extends Vue {
             await transport.Connect()
             console.log(SecuxDevice)
             this.config = await SecuxDevice.getVersion(transport)
+            this.$store.commit('SecuX/setTransport', transport)
+            // console.log(SecuxScreenDevice)
             let app = new AppAvax(transport)
 
             // Close the initial prompt modal if exists

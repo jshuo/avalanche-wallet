@@ -11,6 +11,7 @@ export interface SecuXState {
     messages: ISecuXBlockMessage[]
     title: string
     info: string
+    Transport:{}
 }
 
 export const LEDGER_EXCHANGE_TIMEOUT = 90_000
