@@ -46,7 +46,7 @@ const secux_module: Module<SecuXState, RootState> = {
             console.log(data)
             commit('setTotalBalance', data.totalBalance)
             await SecuxScreenDevice.SetAccount(state.Transport, {
-                name: 'AVAX on SecuX',
+                name: 'AVAX CXP&STAKE ',
                 path: "m/44'/9000'/0'",
                 balance: data.totalBalance,
             })
