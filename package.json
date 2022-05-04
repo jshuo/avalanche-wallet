@@ -33,7 +33,7 @@
         "@ledgerhq/hw-transport-webusb": "5.22.0",
         "@openzeppelin/contracts": "^3.4.2",
         "@secux/app-eth": "^2.1.6",
-        "@secux/hw-app-avalanche": "https://github.com/jshuo/hw-app-avalanche.git#txparse",
+        "@secux/hw-app-avalanche": "https://github.com/jshuo/hw-app-avalanche.git#d7968736ca9cb04a158774e3998bc1063c3926c4",
         "@secux/protocol-device": "^2.1.1",
         "@secux/protocol-transaction": "^2.1.3",
         "@secux/transport-webble": "^2.1.2",
